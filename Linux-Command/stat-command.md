@@ -38,6 +38,19 @@ Saat `stat` dijalankan tanpa opsi apapun, maka informasi berikut akan ditampilka
 
 * **Timestamp** : Menampilkan atime, mtime, ctime, dan btime [Sedikit Catatan Mengenai Konsep Timestamp](https://github.com/vandhaffa07/Documentation-of-The-Linux-Learning-Journey/blob/main/Linux-Command/touch-command.md#timestamp)
 
+Contoh :
+```bash
+stat file_percobaan.txt
+  File: file_percobaan.txt
+  Size: 25              Blocks: 8          IO Block: 4096   regular file
+Device: 8,48    Inode: 31438       Links: 1
+Access: (0644/-rw-r--r--)  Uid: ( 1000/vandhaffa)   Gid: ( 1000/vandhaffa)
+Access: 2025-12-31 21:58:30.143197508 +0700
+Modify: 2025-12-31 21:58:39.531208235 +0700
+Change: 2025-12-31 21:58:39.531208235 +0700
+ Birth: 2025-12-31 21:58:30.143197508 +0700
+```
+
 ---
 
 ## CATATAN KONSEP USER DAN GROUP
@@ -51,11 +64,72 @@ id
 uid=1000(username) gid=1000(username) groups=1000(budi),27(sudo),44(video),100(users),............
 ```
 
-
-
 Ketika kernel mengevaluasi apakah sebuah proses boleh mengakses suatu file, kernel akan mengecek secara berurutan: apakah UID proses sama dengan owner file, jika tidak maka apakah GID proses (baik primary maupun supplementary) cocok dengan group file, dan jika tidak juga, barulah permission untuk others yang digunakan. Artinya, keanggotaan dalam supplementary group memberikan potensi akses tambahan, tetapi tetap dibatasi oleh permission bit pada file atau direktori tersebut. Penting untuk dipahami bahwa menjadi anggota suatu group tidak otomatis berarti memiliki akses penuh ke semua file yang dimiliki group tersebut. Group membership hanya menentukan bahwa user berhak diuji menggunakan permission group. Jika permission group pada file tidak mengizinkan akses, maka akses tetap akan ditolak, meskipun user adalah anggota group tersebut. Dengan kata lain, group adalah identitas, sedangkan keputusan akhir tetap berada pada permission.
 
 Konsep user dan group ini sepenuhnya berlaku di dalam satu sistem Linux yang sama, atau lebih tepatnya di dalam satu kernel yang sama. Group dan permission tidak secara otomatis memungkinkan akses lintas komputer. Jika dua orang masing-masing menggunakan laptop sendiri, maka user dan group pada satu laptop tidak memiliki arti apa pun di laptop lain. Agar beberapa orang dapat bekerja bersama menggunakan mekanisme user dan group, mereka harus masuk ke mesin Linux yang sama, baik secara langsung maupun melalui layanan jaringan seperti SSH. Dalam konteks ini, satu mesin tersebut sering disebut sebagai server, meskipun secara fisik bisa saja hanya sebuah laptop biasa.
 
+## OPTION
+**1. -c atau --format** : Opsi ini memungkinkan pengguna untuk memfilter hanya informasi tertentu yang ingin ditampilkan menggunakan format specifiers.
+### DAFTAR FORMAT SPECIFIER
 
-  
+%n : Nama berkas.
+
+%i : Nomor Inode.
+
+%N : Nama + target symlink
+
+%F : Tipe File (Regular, Symlink, dll)
+
+%s : Ukuran total dalam byte.
+
+%b : Jumlah blok yang dialokasikan.
+
+%B : Ukuran per blok dalam byte.
+
+%o : Ukuran IO Block
+
+%a : Izin akses dalam format oktal (contoh: 644).
+
+%A : Izin akses dalam format simbolik (contoh: -rw-r--r--).
+
+%u : UID owner
+
+%U : Nama pengguna pemilik (Username).
+
+%g : GID 
+
+%G : Nama grup pemilik (Group name).
+
+%x- : Waktu akses terakhir.
+
+%y : Waktu modifikasi terakhir.
+
+%z : Waktu perubahan atribut terakhir.
+
+Contoh (Disini saya menggunakan file yang bernama file_percobaan.txt untuk melakukan eksperimen) :
+
+Misalnya saya ingin mengetahui hanya nama owner dan permission oktal dari file_percobaan.txt, maka saya bisa menggunakan command : 
+```bash
+stat -c "%U %a" file_percobaan.txt
+username 644
+```
+
+**2. -t atau --terse** : Digunakan untuk menampilkan informasi dalam format ringkas satu baris. Biasanya memiliki format urutan kolom yang tetap yakni Nama file, Size, Block, Permission(Dalam Heksadesimal), UID, GID, Device ID, Inode Number, Links, Device Type(Digunakan hanya jika file adalah device file (/dev/*), untuk file regullar selalu 0), Device Type Minor(Pasangan field sebelumnya), atime, mtime, ctime, dan btime (satuan waktu yang digunakan timestamp adalah detik sejak 1 jan 1970)
+
+Contoh (Disini saya masih menggunakan file yang bernama file_percobaan.txt untuk melakukan eksperimen seperti pada penjelasan sebelumnya) : 
+```bash
+stat -t file_percobaan.txt
+file_percobaan.txt 25 8 81a4 1000 1000 848 31438 1 0 0 1767193110 1767193119 1767193119 1767193110 4096
+```
+
+**
+
+
+
+
+
+
+
+
+
+
