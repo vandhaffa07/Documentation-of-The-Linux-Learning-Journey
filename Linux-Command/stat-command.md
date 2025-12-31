@@ -29,4 +29,33 @@ Saat `stat` dijalankan tanpa opsi apapun, maka informasi berikut akan ditampilka
 * **Size** : Menampilkan ukuran file dalam byte.
 
 * **Blocks** : Menampilkan jumlah blok disk yang benar-benar dialokasikan untuk menyimpan isi sebuah file. Filesystem Linux menyimpan data dalam satuan block, bukan byte satu per satu. Ketika sebuah file dibuat atau diisi, filesystem akan mengalokasikan sejumlah block untuk menyimpan data tersebut, dan jumlah block inilah yang ditampilkan pada field Blocks.
+
+* **IO Block** : Menampilkan ukuran satuan data optimal yang digunakan oleh kernel dan filesystem saat melakukan operasi baca dan tulis terhadap file tersebut. IO Block bukanlah ukuran file, dan juga bukan jumlah blok yang dipakai file. IO Block menjelaskan bagaimana kernel berinteraksi dengan disk, bukan seberapa banyak disk yang dipakai. Ketika sebuah file diakses, baik untuk membaca isi file maupun hanya mengambil metadata seperti saat menjalankan stat, kernel mungkin perlu membaca data dari disk. Operasi baca kernel ini tidak dilakukan byte per byte, melainkan dalam potongan data berukuran tetap yang disebut IO Block. Misal nilai IO Block adalah 4096 byte, Maka setiap 4096 byte data yang dibaca oleh kernel dari disk kernel akan mencatat data tersebut dan menyimpannya ke page cache di memori sebagai 1 page. Jika data yang dibutuhkan lebih besar, kernel akan membaca IO Block berikutnya secara bertahap
+  
+* **Access (permissions)** : Menampilkan Hak akses file dalam format numerik (misalnya 755) maupun simbolik (misalnya rwxr-xr-x) [Sedikit Catatan Mengenai Konsep Permission](https://github.com/vandhaffa07/Documentation-of-The-Linux-Learning-Journey/blob/main/Linux-Command/mkdir-command.md#konsep-permission-pada-direktori-dan-file-linux)
+
+* **UID / GID** : Menampilkan identitas pemilik file dan kelompok pemilik file yang digunakan kernel Linux untuk mengatur hak akses dan kontrol keamanan. UID (User ID) adalah identitas numerik pengguna yang tercatat sebagai pemilik file. GID (Group ID) adalah identitas numerik kelompok (group) yang tercatat sebagai pemilik grup file tersebut. Penting untuk dipahami bahwa kernel Linux tidak bekerja dengan nama pengguna atau nama grup, melainkan angka. Nama seperti root, user, atau www-data hanyalah representasi di level user space yang dipetakan ke UID dan GID. Di level kernel dan filesystem, yang disimpan dan diproses hanyalah identitas numerik UID dan GID.
+
+* **Timestamp** : Menampilkan atime, mtime, ctime, dan btime [Sedikit Catatan Mengenai Konsep Timestamp](https://github.com/vandhaffa07/Documentation-of-The-Linux-Learning-Journey/blob/main/Linux-Command/touch-command.md#timestamp)
+
+---
+
+## CATATAN KONSEP USER DAN GROUP
+User adalah sebuah identitas abstrak yang dipakai kernel untuk menandai proses dan menentukan hak akses. Sedangkan Group adalah identitas kolektif yang memungkinkan beberapa user dikelompokkan agar bisa berbagi akses ke resource tertentu tanpa harus mengatur izin satu per satu.
+
+Setiap user di Linux selalu memiliki satu primary group dan bisa memiliki nol atau lebih supplementary group. Primary group adalah group utama yang melekat langsung pada user dan digunakan secara default oleh sistem. Ketika seorang user membuat file atau direktori, file tersebut secara otomatis akan dimiliki oleh primary group user tersebut. Pada sistem Linux modern, primary group biasanya dibuat khusus untuk setiap user dan memiliki nama yang sama dengan username. Model ini dikenal sebagai User Private Group, di mana primary group tersebut secara efektif hanya berisi satu user. Tujuannya adalah keamanan, dimana file yang dibuat user secara default tidak langsung dapat diakses oleh user lain.
+
+Selain primary group, user juga bisa menjadi anggota supplementary group. Supplementary group tidak digunakan sebagai group default saat membuat file, tetapi berperan penting saat pengecekan izin akses.Secara default, user di Linux biasanya dimasukkan ke beberapa supplementary groups agar bisa melakukan tugas teknis tanpa harus menjadi Roo. Seperti Group sudo agar kita bisa menjalankan perintah administrator, Group video agar kita punya izin mengakses webcam atau akselerasi kartu grafis, dll. Kita bisa mengecek group mana saja yang terafiliasi dengan kita dengan cara : 
+```bash
+id
+uid=1000(username) gid=1000(username) groups=1000(budi),27(sudo),44(video),100(users),............
+```
+
+
+
+Ketika kernel mengevaluasi apakah sebuah proses boleh mengakses suatu file, kernel akan mengecek secara berurutan: apakah UID proses sama dengan owner file, jika tidak maka apakah GID proses (baik primary maupun supplementary) cocok dengan group file, dan jika tidak juga, barulah permission untuk others yang digunakan. Artinya, keanggotaan dalam supplementary group memberikan potensi akses tambahan, tetapi tetap dibatasi oleh permission bit pada file atau direktori tersebut. Penting untuk dipahami bahwa menjadi anggota suatu group tidak otomatis berarti memiliki akses penuh ke semua file yang dimiliki group tersebut. Group membership hanya menentukan bahwa user berhak diuji menggunakan permission group. Jika permission group pada file tidak mengizinkan akses, maka akses tetap akan ditolak, meskipun user adalah anggota group tersebut. Dengan kata lain, group adalah identitas, sedangkan keputusan akhir tetap berada pada permission.
+
+Konsep user dan group ini sepenuhnya berlaku di dalam satu sistem Linux yang sama, atau lebih tepatnya di dalam satu kernel yang sama. Group dan permission tidak secara otomatis memungkinkan akses lintas komputer. Jika dua orang masing-masing menggunakan laptop sendiri, maka user dan group pada satu laptop tidak memiliki arti apa pun di laptop lain. Agar beberapa orang dapat bekerja bersama menggunakan mekanisme user dan group, mereka harus masuk ke mesin Linux yang sama, baik secara langsung maupun melalui layanan jaringan seperti SSH. Dalam konteks ini, satu mesin tersebut sering disebut sebagai server, meskipun secara fisik bisa saja hanya sebuah laptop biasa.
+
+
   
