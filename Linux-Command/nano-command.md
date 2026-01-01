@@ -215,8 +215,8 @@ nano -m nama_file.txt
 ```
 
 ## SHORTCUT NANO
-* **File & Session Control**
-  
+### File & Session Control
+
 | Shortcut | Fungsi | Penjelasan |
 | :--- | :--- | :--- |
 | **Ctrl + O** | Write Out | Menyimpan file yang sedang diedit. |
@@ -225,15 +225,49 @@ nano -m nama_file.txt
 | **Ctrl + G** | Help | Menampilkan menu bantuan dan panduan penggunaan Nano. |
 | **Ctrl + C** | Cursor Info | Menampilkan informasi posisi kursor (nomor baris dan kolom) di bagian bawah. |
 
-* **Navigasi Cepat**
+### Navigasi Cepat
 
-| Shortcut | Fungsi | Penjelasan Rinci |
+| Shortcut | Fungsi | Penjelasan |
 | :--- | :--- | :--- |
 | **Ctrl + A** | Start of Line | Melompat ke awal baris tempat kursor berada. |
 | **Ctrl + E** | End of Line | Melompat ke akhir baris tempat kursor berada. |
 | **Alt + G** | Go To Line | Melompat ke nomor baris tertentu sesuai input pengguna. |
 
+### Search and Replace
 
+| Shortcut | Fungsi | Penjelasan |
+| :--- | :--- | :--- |
+| **Ctrl + W** | Search | Mencari kata atau teks tertentu di dalam file. |
+| **Alt + W** | Repeat Search | Mengulang pencarian terakhir untuk menemukan kecocokan berikutnya. |
+| **Ctrl + \\** | Search & Replace | Mencari teks tertentu dan menggantinya dengan teks lain. |
+| **Ctrl+W Kemudian Alt + C** | Case Sensitive | Mengaktifkan/menonaktifkan sensitivitas huruf besar dan kecil (saat di menu Search). |
+| **Ctrl+W Kemudian Alt + R** | Regex | Mengaktifkan penggunaan *Regular Expressions* (saat di menu Search). |
 
+**Tabel symbol Regex :**
 
+| Simbol | Nama / Jenis | Artinya | Contoh Pola | Contoh Cocok |
+| :--- | :--- | :--- | :--- | :--- |
+| **.** | Titik | 1 karakter apa saja | `.r.o.o.t` | root, r1o2o3t |
+| ***** | Asterisk | 0 atau lebih karakter sebelumnya | `lo*` | l, lo, loo, looo |
+| **+** | Plus | 1 atau lebih karakter sebelumnya | `[0-9]+` | 1, 12, 123 |
+| **?** | Question Mark | 0 atau 1 karakter sebelumnya | `colou?r` | color, colour |
+| **[abc]** | Character Class | Salah satu karakter dalam kurung | `[abc]` | a atau b atau c |
+| **[a-z]** | Range Huruf | Jangkauan huruf kecil | `[a-z]` | admin, user |
+| **[A-Z]** | Range Huruf | Jangkauan huruf besar | `[A-Z]` | ID, NAMA |
+| **[^...]** | Negasi | Selain isi di dalam kurung siku | `[^0-9]` | a, B, ! (bukan angka) |
+| **$** | Akhir Baris | Mencocokkan teks di akhir baris | `123$` | test123 |
 
+### Cut, Copy, Paste
+
+| Shortcut | Fungsi | Penjelasan |
+| :--- | :--- | :--- |
+| **Ctrl + K** | Cut Line | Memotong seluruh baris pada posisi kursor dan menyimpannya di buffer. |
+| **Ctrl + U** | Paste | Menempelkan (Uncut) teks yang ada di dalam buffer ke posisi kursor. |
+| **Alt + 6** | Copy Line | Menyalin baris saat ini ke buffer tanpa menghapusnya (Copy). |
+
+### Undo dan Redo
+
+| Shortcut | Fungsi | Penjelasan |
+| :--- | :--- | :--- |
+| **Alt + U** | Undo | Membatalkan perubahan atau aksi terakhir yang dilakukan. |
+| **Alt + E** | Redo | Mengulang kembali perubahan yang sebelumnya telah dibatalkan (Undo). |
