@@ -229,6 +229,78 @@ Ini adalah file sumberrr
 ```
 Dapat terlihat bahwa bahwa isi file_tujuan.txt kini telah diperbarui mengikuti isi terbaru dari file sumber.
 
+**7. -p atau --preserve** : Berfungsi untuk menjaga atribut asli file agar tidak berubah saat disalin ke lokasi baru. Secara default, saat kita menyalin file, sistem akan menganggapnya sebagai file baru dengan waktu (timestamp) dan kepemilikan (ownership) sesuai saat perintah dijalankan. Namun, dengan opsi ini, atribut berikut akan dipertahankan
+
+Misalnya saya memiliki sebauh file dengan atribut seperti ini :
+```bash
+stat file_percobaan.txt
+  File: file_percobaan.txt
+  Size: 0               Blocks: 0          IO Block: 4096   regular empty file
+Device: 8,48    Inode: 32979       Links: 1
+Access: (0644/-rw-r--r--)  Uid: ( 1000/username)   Gid: ( 1000/username)
+Access: 2026-01-02 05:04:21.688410145 +0700
+Modify: 2026-01-02 05:04:21.688410145 +0700
+Change: 2026-01-02 05:04:21.688410145 +0700
+ Birth: 2026-01-02 05:04:21.684410151 +0700
+```
+Jika saya menyalin secara biasa (cp tanpa opsi), timestamp file salinan akan berubah menjadi saat ini. Namun ketika digunakan dengan option p, maka :
+```bash
+cp -p file_percobaan.txt salinan_file_percobaan.txt
+```
+```bash
+stat salinan_file_percobaan.txt
+  File: salinan_file_percobaan.txt
+  Size: 0               Blocks: 0          IO Block: 4096   regular empty file
+Device: 8,48    Inode: 34403       Links: 1
+Access: (0644/-rw-r--r--)  Uid: ( 1000/username)   Gid: ( 1000/username)
+Access: 2026-01-02 05:04:21.688410145 +0700
+Modify: 2026-01-02 05:04:21.688410145 +0700
+Change: 2026-01-02 05:05:24.552349312 +0700
+ Birth: 2026-01-02 05:05:24.552349312 +0700
+```
+Dapat terlihat bahwa atime dan mtime tetap sama dengan file aslinya. Hal ini membuktikan bahwa opsi -p berhasil menyalin riwayat akses dan modifikasi konten file tersebut. Namun, ctime dan btime tetap menunjukkan waktu saat ini. Hal ini dikarenakan ctime mencatat kapan metadata file (seperti inode, kepemilikan, atau lokasi di disk) berubah. Karena proses penyalinan melibatkan pembuatan entri baru di sistem file, metadata tersebut otomatis berubah saat file dibuat di tujuan. dan btime mencatat kapan file tersebut secara fisik dilahirkan atau dibuat di dalam sistem file. Karena salinan tersebut adalah entitas baru di atas disk, maka sistem tetap mencatat waktu pembuatannya sesuai dengan detik saat perintah cp dijalankan.
+
+**8. a atau --archive** : Digunakan untuk melakukan penyalinan dalam "mode arsip", yang merupakan cara paling praktis untuk menduplikasi direktori secara utuh tanpa kehilangan detail sekecil apa pun. Menggunakan -a sama saja dengan mengaktifkan tiga fitur sekaligus, yakni bekerja secara rekursif (-r) untuk menjangkau seluruh isi folder, tetap menjaga atribut asli file (-p) seperti pemilik dan waktu modifikasi, serta mampu mempertahankan symbolic link agar tetap mengarah ke tujuan aslinya.
+
+Sebagai contoh, saya memiliki struktur direktori bertingkat dengan atribut file sebagai berikut:
+```bash
+tree website/
+website/
+├── assets
+│   └── style.css
+└── pages
+    └── index.html
+
+3 directories, 2 files
+```
+```bash
+stat website/assets/style.css
+  File: website/assets/style.css
+  Size: 0               Blocks: 0          IO Block: 4096   regular empty file
+Device: 8,48    Inode: 53139       Links: 1
+Access: (0644/-rw-r--r--)  Uid: ( 1000/username)   Gid: ( 1000/username)
+Access: 2026-01-02 05:14:23.356278034 +0700
+Modify: 2026-01-02 05:14:23.356278034 +0700
+Change: 2026-01-02 05:14:23.356278034 +0700
+ Birth: 2026-01-02 05:14:23.356278034 +0700
+```
+```bash
+stat website/pages/index.html
+  File: website/pages/index.html
+  Size: 0               Blocks: 0          IO Block: 4096   regular empty file
+Device: 8,48    Inode: 53140       Links: 1
+Access: (0644/-rw-r--r--)  Uid: ( 1000/username)   Gid: ( 1000/username)
+Access: 2026-01-02 05:14:23.360278889 +0700
+Modify: 2026-01-02 05:14:23.360278889 +0700
+Change: 2026-01-02 05:14:23.360278889 +0700
+ Birth: 2026-01-02 05:14:23.360278889 +0700
+```
+Kemudian, saya ingin menyalin keseluruhan folder tersebut, ke dalam folder kosong yang bernama backup :
+
+
+
+
+
 
 
 
