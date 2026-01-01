@@ -44,7 +44,7 @@ stat file_percobaan.txt
   File: file_percobaan.txt
   Size: 25              Blocks: 8          IO Block: 4096   regular file
 Device: 8,48    Inode: 31438       Links: 1
-Access: (0644/-rw-r--r--)  Uid: ( 1000/vandhaffa)   Gid: ( 1000/vandhaffa)
+Access: (0644/-rw-r--r--)  Uid: ( 1000/username)   Gid: ( 1000/username)
 Access: 2025-12-31 21:58:30.143197508 +0700
 Modify: 2025-12-31 21:58:39.531208235 +0700
 Change: 2025-12-31 21:58:39.531208235 +0700
@@ -61,7 +61,7 @@ Setiap user di Linux selalu memiliki satu primary group dan bisa memiliki nol at
 Selain primary group, user juga bisa menjadi anggota supplementary group. Supplementary group tidak digunakan sebagai group default saat membuat file, tetapi berperan penting saat pengecekan izin akses.Secara default, user di Linux biasanya dimasukkan ke beberapa supplementary groups agar bisa melakukan tugas teknis tanpa harus menjadi Roo. Seperti Group sudo agar kita bisa menjalankan perintah administrator, Group video agar kita punya izin mengakses webcam atau akselerasi kartu grafis, dll. Kita bisa mengecek group mana saja yang terafiliasi dengan kita dengan cara : 
 ```bash
 id
-uid=1000(username) gid=1000(username) groups=1000(budi),27(sudo),44(video),100(users),............
+uid=1000(username) gid=1000(username) groups=1000(username),27(sudo),44(video),100(users),............
 ```
 
 Ketika kernel mengevaluasi apakah sebuah proses boleh mengakses suatu file, kernel akan mengecek secara berurutan: apakah UID proses sama dengan owner file, jika tidak maka apakah GID proses (baik primary maupun supplementary) cocok dengan group file, dan jika tidak juga, barulah permission untuk others yang digunakan. Artinya, keanggotaan dalam supplementary group memberikan potensi akses tambahan, tetapi tetap dibatasi oleh permission bit pada file atau direktori tersebut. Penting untuk dipahami bahwa menjadi anggota suatu group tidak otomatis berarti memiliki akses penuh ke semua file yang dimiliki group tersebut. Group membership hanya menentukan bahwa user berhak diuji menggunakan permission group. Jika permission group pada file tidak mengizinkan akses, maka akses tetap akan ditolak, meskipun user adalah anggota group tersebut. Dengan kata lain, group adalah identitas, sedangkan keputusan akhir tetap berada pada permission.
@@ -122,11 +122,58 @@ stat -t file_percobaan.txt
 file_percobaan.txt 25 8 81a4 1000 1000 848 31438 1 0 0 1767193110 1767193119 1767193119 1767193110 4096
 ```
 
-**
+**3. -f atau --gile-system** : Digunakan untuk menampilkan informasi tentang filesytem yang mengelola file tersebut, bukan informasi file itu sendiri.
 
+### ARTI OUTPUT OPTION f SETIAP FIELD
+* **File** : Menampilkan nama file kita. Digunakan memberi tahu filesystem yang akan dijelaskan adalah filesystem tempat file ini berada
+* **ID** : Menampilkan Filesystem ID. Yakni identitas unik filesystem yang digunakan kernel untuk membedakan filesystem. Karena di Linux, satu sistem operasi dapat menggunakan banyak filesystem sekaligus yang masing-masing berada device atau partisi berbeda.
+* **Namelen** : Menunjukkan jumlah karakter maksimum untuk nama file yang diizinkan oleh filesystem ini.
+* **Type** : Menampilkan jenis filesystem seperti ext4, xfs, tmpfs, atau overlay
+* **Block Size** : Memiliki konsep yang sama dengan IO Block pada field command stat tanpa option, yakni ukuran satuan optimal yang digunakan kernel untuk membaca data suatu file dari disk
+* **Fundamental Block Size** : Menampilkan unit alokasi terkecil di filesystem. Saat file dibuat, filesystem selalu menggunakan kelipatan fundamental block untuk menyimpan data. File yang lebih kecil dari satu blok tetap menggunakan minimal satu blok. Inode menyimpan pointer ke blok-blok ini di disk, sementara kernel menggunakan IO Block untuk membaca atau menulis data secara efisien ke blok-blok tersebut.
+* **Blocks Total** : Menampilkan jumlah total block dalam filesystem. Ini adalah ukuran mentah filesystem, bukan sisa ruang.
+* **Blocks Free** : Menampilkan jumlah block kosong secara teknis. Termasuk block yang boleh dipakai root dan block yang disisihkan sistem. Artinya Belum tentu semuanya bisa dipakai user biasa.
+* **Blocks Available** : Menampilkan jumlah block yang benar-benar bisa dipakai user yang bukan root ataupun sistem
+* **Inodes Total** : Menampilkan jumlah inode maksimum dalam file system.
+* **Inodes Free** : Menampilkan jumlah inode yang masih tersedia.
 
+Contoh (Disini saya masih menggunakan file bernama file_percobaan.txt seperti sebelum-sebelumnya untuk melihat info lenkap mengenai file system apa yang mengelola file tsb) :
+```bash
+stat -f file_percobaan.txt
+  File: "file_percobaan.txt"
+    ID: b387720eb46ab5e1 Namelen: 255     Type: ext2/ext3
+Block size: 4096       Fundamental block size: 4096
+Blocks: Total: 263940717  Free: 262988030  Available: 249562162
+Inodes: Total: 67108864   Free: 67044023
+```
+**4. -L atau --dereference** : Ketika menggunakan command stat secara default pada suatu file symlink, stat akan menampilkan informasi symbolic link itu sendiri. Tetapi, dengan -L, stat akan mengikuti symlink dan menampilkan informasi file tujuan sebenarnya.
 
+Contoh (Disini saya mempunyai symlink yang menuju pada suatu file) :
 
+Tanpa option L :
+```bash
+stat file_symlink
+  File: file_symlink -> ~/FOLDER_SYMLINK/catatan.txt
+  Size: 42              Blocks: 0          IO Block: 4096   symbolic link
+Device: 8,48    Inode: 32922       Links: 1
+Access: (0777/lrwxrwxrwx)  Uid: ( 1000/username)   Gid: ( 1000/username)
+Access: 2026-01-01 09:15:42.234299299 +0700
+Modify: 2026-01-01 09:15:38.742162914 +0700
+Change: 2026-01-01 09:15:38.742162914 +0700
+ Birth: 2026-01-01 09:15:38.742162914 +0700
+```
+Dengan option L : 
+```bash
+ stat -L file_symlink
+  File: file_symlink
+  Size: 0               Blocks: 0          IO Block: 4096   regular empty file
+Device: 8,48    Inode: 32969       Links: 1
+Access: (0644/-rw-r--r--)  Uid: ( 1000/username)   Gid: ( 1000/username)
+Access: 2026-01-01 09:16:17.359690269 +0700
+Modify: 2026-01-01 09:16:17.359690269 +0700
+Change: 2026-01-01 09:16:17.359690269 +0700
+ Birth: 2026-01-01 09:16:17.355690112 +0700
+```
 
 
 
