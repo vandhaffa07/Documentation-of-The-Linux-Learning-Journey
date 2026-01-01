@@ -68,6 +68,8 @@ Ketika kernel mengevaluasi apakah sebuah proses boleh mengakses suatu file, kern
 
 Konsep user dan group ini sepenuhnya berlaku di dalam satu sistem Linux yang sama, atau lebih tepatnya di dalam satu kernel yang sama. Group dan permission tidak secara otomatis memungkinkan akses lintas komputer. Jika dua orang masing-masing menggunakan laptop sendiri, maka user dan group pada satu laptop tidak memiliki arti apa pun di laptop lain. Agar beberapa orang dapat bekerja bersama menggunakan mekanisme user dan group, mereka harus masuk ke mesin Linux yang sama, baik secara langsung maupun melalui layanan jaringan seperti SSH. Dalam konteks ini, satu mesin tersebut sering disebut sebagai server, meskipun secara fisik bisa saja hanya sebuah laptop biasa.
 
+---
+
 ## OPTION
 **1. -c atau --format** : Opsi ini memungkinkan pengguna untuk memfilter hanya informasi tertentu yang ingin ditampilkan menggunakan format specifiers.
 ### DAFTAR FORMAT SPECIFIER
