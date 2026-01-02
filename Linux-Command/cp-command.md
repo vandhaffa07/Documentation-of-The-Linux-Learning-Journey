@@ -295,11 +295,130 @@ Modify: 2026-01-02 05:14:23.360278889 +0700
 Change: 2026-01-02 05:14:23.360278889 +0700
  Birth: 2026-01-02 05:14:23.360278889 +0700
 ```
-Kemudian, saya ingin menyalin keseluruhan folder tersebut, ke dalam folder kosong yang bernama backup :
+Kemudian, saya ingin menyalin keseluruhan folder tersebut beserta atributnya, ke dalam folder kosong yang bernama backup :
+```bash
+ cp -a website backup
+```
+Langkah selanjutnya adalah melakukan pengecekan apakah folder website benar benar terduplikasi secara sempurna kedalam folder backup. Maka saya cukup menjalankan perintah berikut :
+```bash
+tree backup/
+backup/
+└── website
+    ├── assets
+    │   └── style.css
+    └── pages
+        └── index.html
 
+4 directories, 2 files
+```
+```bash
+stat backup/website/assets/style.css
+  File: backup/website/assets/style.css
+  Size: 0               Blocks: 0          IO Block: 4096   regular empty file
+Device: 8,48    Inode: 35048       Links: 1
+Access: (0644/-rw-r--r--)  Uid: ( 1000/username)   Gid: ( 1000/username)
+Access: 2026-01-02 05:14:23.356278034 +0700
+Modify: 2026-01-02 05:14:23.356278034 +0700
+Change: 2026-01-02 09:29:43.019653421 +0700
+ Birth: 2026-01-02 09:29:43.019653421 +0700
+```
+```bash
+stat backup/website/pages/index.html
+ File: backup/website/pages/index.html
+  Size: 0               Blocks: 0          IO Block: 4096   regular empty file
+Device: 8,48    Inode: 53104       Links: 1
+Access: (0644/-rw-r--r--)  Uid: ( 1000/username)   Gid: ( 1000/username)
+Access: 2026-01-02 05:14:23.360278889 +0700
+Modify: 2026-01-02 05:14:23.360278889 +0700
+Change: 2026-01-02 09:29:43.023653416 +0700
+ Birth: 2026-01-02 09:29:43.023653416 +0700
+```
+Dapat terlihat bahwa melalui penggunaan perintah cp -a, struktur direktori website telah berhasil disalin secara utuh ke dalam folder backup. Jika kita perhatikan output dari perintah stat pada file hasil salinan, nilai Modify (mtime) dan Access (atime) tetap menunjukkan waktu yang sama persis dengan file aslinya (pukul 05:14), bukan waktu saat perintah penyalinan dijalankan. Dengan demikian, salinan ini merupakan duplikat yang sempurna secara fungsional, menjaga seluruh izin akses dan riwayat modifikasi asli dari struktur folder aslinya.
 
+**9. -n atau --no-clobber** : Tidak menimpa file tujuan jika file tersebut sudah ada.
 
+Misalnya dalam sebuah direktori bernama test saya memiliki 2 file yang isinya seperti ini :
+```bash
+cat file1.txt && cat file2.txt
+Ini adalah file1
+Ini adalah file2
+```
+Selanjutnya, saya akan menyalin file1.txt dengan menetapkan file2.txt sebagai targetnya. Karena file2.txt sudah ada di direktori tersebut, maka perintah cp -n tidak akan dijalankan sehingga file tidak akan terduplikasi : 
+```bash
+cp -n file1.txt file2.txt
+```
+```bash
+ cat file1.txt && cat file2.txt
+Ini adalah file1
+Ini adalah file2
+```
+Dapat terlihat bahwa setelah perintah cp -n dijalankan, tidak ada perubahan apa pun pada isi file2.txt. Meskipun perintah tersebut dieksekusi tanpa pesan kesalahan, opsi --no-clobber bekerja sebagai pelindung yang secara otomatis membatalkan proses penyalinan karena mendeteksi bahwa file tujuan sudah ada di direktori tersebut.
 
+**10. -l atau links** : Menyalin sebuah file menjadi sebuah file kembar dengan Inode yang sama, sehingga ketika isi konten salah satu file berubah, file kembarannya juga ikut mengalami perubahan yang sama
+
+Contoh :
+```bash
+stat file_percobaan.txt
+  File: file_percobaan.txt
+  Size: 0               Blocks: 0          IO Block: 4096   regular empty file
+Device: 8,48    Inode: 32979       Links: 1
+Access: (0644/-rw-r--r--)  Uid: ( 1000/username)   Gid: ( 1000/username)
+Access: 2026-01-02 09:48:26.746674360 +0700
+Modify: 2026-01-02 09:48:26.746674360 +0700
+Change: 2026-01-02 09:48:26.746674360 +0700
+ Birth: 2026-01-02 09:48:26.746674360 +0700
+```
+```bash
+cp -l file_percobaan.txt kembaran_file_percobaan.txt
+```
+```bash
+stat kembaran_file_percobaan.txt
+  File: kembaran_file_percobaan.txt
+  Size: 0               Blocks: 0          IO Block: 4096   regular empty file
+Device: 8,48    Inode: 32979       Links: 2
+Access: (0644/-rw-r--r--)  Uid: ( 1000/username)   Gid: ( 1000/username)
+Access: 2026-01-02 09:48:26.746674360 +0700
+Modify: 2026-01-02 09:48:26.746674360 +0700
+Change: 2026-01-02 09:48:47.474654897 +0700
+ Birth: 2026-01-02 09:48:26.746674360 +0700
+```
+Dapat terlihat bahwa setelah menjalankan perintah cp -l, kedua file tersebut memiliki nomor Inode yang identik, yaitu 32979. Dalam sistem file Linux, Inode adalah penunjuk fisik ke data di atas disk. Karena nomor Inodenya sama, ini berarti file_percobaan.txt dan kembaran_file_percobaan.txt sebenarnya adalah satu data yang sama namun memiliki dua nama berbeda. Dapat terlihat pula bahwa jumlah Links pada output stat berubah dari 1 menjadi 2. Hal ini menunjukkan bahwa sekarang ada 2 nama file yang merujuk ke data fisik yang sama. Hal ini juga yang membuat ctime mengalami perubahan, karena links termasuk metadata.
+
+Selanjutnya saya akan mengedit salah satu file dari kedua file kembar tersebut untuk mengecek apakah benar, ketika 1 file berubah, maka file yang lainnya juga ikut berubah :
+```bash
+echo "Ini adalah perubahannya" > file_percobaan.txt
+```
+```bash
+cat file_percobaan.txt kembaran_file_percobaan.txt
+Ini adalah perubahannya
+Ini adalah perubahannya
+```
+Dapat terlihat bahwa ketika saya mengedit konten di file_percobaan.txt, perubahan tersebut secara otomatis berlaku pada kembaran_file_percobaan.txt
+
+**11. -s atau --symbolic-link** :  Membuat salinan dalam bentuk symbolic link (shortcut) yang menunjuk ke file sumber.
+
+Misalnya saya mempunyai file catatan.txt yang isinya :
+```bash
+cat catatan.txt
+Ini adalah file catatan saya
+```
+Selanjutnya saya ingin membuat salinan file tersebut dalam bentuk symlink menggunakan cp -s dan mengecek apa yang ada di dalamnya:
+```bash
+ cp -s catatan.txt symlink_catatan.txt
+```
+```bash
+ls
+catatan.txt  symlink_catatan.txt (PADA TERMINAL SAYA, FILE INI BERWARNA CYAN)
+```
+
+<img width="594" height="117" alt="image" src="https://github.com/user-attachments/assets/24efdff9-187a-41f5-9055-14fd8bb4f8f4" />
+
+Dapat terlihat bahwa file benar-benar terduplikasi menjadi file symlink yang mengarah pada file sumber, selain itu, jika kita membaca isi file symlink tersebut, hasilnya akan tetap identik dengan file sumber :
+
+```bash
+cat symlink_catatan.txt
+Ini adalah file catatan saya
+```
 
 
 
