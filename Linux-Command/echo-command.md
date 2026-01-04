@@ -83,6 +83,7 @@ Dapat dilihat bahwa isi file menyapa.txt benar benar tertimpa oleh output echo. 
 echo "SELAMAT PAGI" >> menyapa.txt
 ```
 ```bash
+cat menyapa.txt
 HAI
 SELAMAT PAGI
 ```
