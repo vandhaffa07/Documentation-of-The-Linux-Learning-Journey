@@ -231,7 +231,7 @@ Dapat terlihat bahwa bahwa isi file_tujuan.txt kini telah diperbarui mengikuti i
 
 **7. -p atau --preserve** : Berfungsi untuk menjaga atribut asli file agar tidak berubah saat disalin ke lokasi baru. Secara default, saat kita menyalin file, sistem akan menganggapnya sebagai file baru dengan waktu (timestamp) dan kepemilikan (ownership) sesuai saat perintah dijalankan. Namun, dengan opsi ini, atribut berikut akan dipertahankan
 
-Misalnya saya memiliki sebauh file dengan atribut seperti ini :
+Misalnya saya memiliki sebuahh file dengan atribut seperti ini :
 ```bash
 stat file_percobaan.txt
   File: file_percobaan.txt
