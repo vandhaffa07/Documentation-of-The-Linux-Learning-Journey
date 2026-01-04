@@ -128,8 +128,6 @@ nano skrip_bash.sh
 Kemudian didalam nano saya membuat skrip ini :
 ```bash
 #!/bin/bash
-# Skrip Bash: Demo Echo
-# Menunjukkan penggunaan echo dengan opsi, variabel, dan redirect file
 
 # Membuat variabel
 nama="vandhaffa"
