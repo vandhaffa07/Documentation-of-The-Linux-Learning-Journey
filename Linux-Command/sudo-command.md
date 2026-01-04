@@ -167,4 +167,167 @@ root
 ```
 Dapat terlihat bahwa identitas pengguna telah berubah menjadi root, dan variabel lingkungan $HOME kini mengarah ke direktori /root. Namun demikian, variabel $PWD (direktori kerja saat ini) tetap menunjuk ke direktori awal, yaitu /home/vandhaffa. Kondisi inilah yang menegaskan perbedaan mendasar antara opsi -s dan -i pada perintah sudo. Dimana pada opsi -i, sudo mensimulasikan login shell sebagai root, sehingga direktori kerja secara otomatis dipindahkan ke /root dan lingkungan root dimuat sepenuhnya. Sebaliknya, pada opsi -s, pengguna memang memperoleh hak akses root, tetapi direktori kerja tidak diubah dan tetap berada pada lokasi sebelumnya.
 
+**5. -l atau --list** : Opsi ini digunakan untuk menampilkan daftar hak akses dan perintah apa saja yang diizinkan (atau dilarang) untuk dijalankan oleh pengguna melalui sudo. Opsi ini akan membaca file konfigurasi sistem yang disebut /etc/sudoers dan menampilkan ringkasan aturannya dengan format :
+
+`(User yang diizinkan : Group yang diizinkan) Perintah yang diizinkan`
+
+Sebagai contoh, disini saya ingin melihat hak akses apa saja yang dimiliki oleh akun yang saya gunakan saat ini yakni vandhaffa, maka saya cukup menggunakan command seperti ini : 
+```bash
+sudo -l
+Matching Defaults entries for vandhaffa on LAPTOP-BVIKQQAI:
+    env_reset, mail_badpass, secure_path=/usr/local/sbin\:/usr/local/bin\:/usr/sbin\:/usr/bin\:/sbin\:/bin, use_pty
+
+User vandhaffa may run the following commands on LAPTOP-BVIKQQAI:
+    (ALL : ALL) ALL
+```
+Dapat terlihat bahwa pada baris terakhir terdapat keterangan (ALL : ALL) ALL. Ini adalah tingkat akses tertinggi yang berarti user vandhaffa diizinkan menjalankan semua perintah sebagai semua user dan semua grup.
+
+Tidak hanya itu, opsi -l juga bisa dikombinasikan dengan opsi -U (User list) untuk melakukan pengecekan hak akses milik user lain. Format perintahnya adalah: 
+```bash
+sudo -U nama_user -l
+```
+Sebagai contoh, saya ingin memastikan dan membandingkan hak akses antara user root(administrator tertinggi) dengan user www-data(user untuk layanan web server). Maka saya cukup menggunakan command seperti ini : 
+```bash
+sudo -U root -l
+Matching Defaults entries for root on LAPTOP-BVIKQQAI:
+    env_reset, mail_badpass, secure_path=/usr/local/sbin\:/usr/local/bin\:/usr/sbin\:/usr/bin\:/sbin\:/bin, use_pty
+
+User root may run the following commands on LAPTOP-BVIKQQAI:
+    (ALL : ALL) ALL
+```
+Dapat terlihat bahwa pada baris terakhir, user root memiliki izin (ALL : ALL) ALL. Ini mengonfirmasi bahwa root adalah superuser yang memiliki kekuasaan mutlak untuk menjalankan perintah apa pun sebagai siapa pun.
+
+Selanjutnya, saya ingin memeriksa apakah user www-data memiliki hak untuk menggunakan sudo dengan menggunakan command yang sama :
+```bash
+sudo -U www-data -l
+User www-data is not allowed to run sudo on LAPTOP-BVIKQQAI.
+```
+Dapat terlihat pula bahwa sistem memberikan keterangan tegas bahwa user www-data tidak diizinkan menjalankan perintah sudo. Ini adalah praktik keamanan yang benar, karena user layanan aplikasi seharusnya tidak memiliki hak administratif demi mencegah eksploitasi jika server web diretas.
+
+**6. -v atau --validate** : Opsi ini digunakan untuk memperbarui autentikasi atau masa berlaku kata sandi sudo kita tanpa menjalankan perintah apa pun. Seperti yang saya katakan pada penjelasan [No Option](https://github.com/vandhaffa07/Documentation-of-The-Linux-Learning-Journey/edit/main/Linux-Command/sudo-command.md#:~:text=OPTION-,1.%20No%20option,-%3A%20Tanpa%20menggunakan%20opsi), sudo akan meminta password saat pertama kali kita jalankan dan akan mengingat kita dalam kurun waktu 5–15 menit. Selama kurun waktu itu, kita bisa menggunakan sudo sepuasnya tanpa harus input password setiap kali kita menjalankannya. Tapi setelah kurun waktu tersebut habis, maka akan ada konfirmasi ulang lagi berupa input password. Opsi -v hadir untuk memperbarui stempel waktu (timestamp) tersebut agar masa tenggangnya kembali penuh dari awal.
+
+Sebagai contoh, misalkan saya ingin menginstal software Firefox. Karena proses ini melibatkan beberapa tahap yang mungkin memakan waktu lama (seperti men-download data yang besar), saya akan menggunakan kombinasi perintah berikut:
+
+Mula-mula saya akan menjalankan perintah update untuk menyegarkan daftar aplikasi. Karena ini adalah perintah pertama, sistem akan meminta password seperti ini :
+```bash
+sudo apt update
+[sudo] password for vandhaffa:
+# Proses update sedang berlangsung...
+```
+Setelah proses update selesai. Selanjutnya, saya akan menjalankan perintah upgrade. Karena masa autentikasi saya belum habis, maka saya tidak perlu input password lagi untuk menjalankan perintah ini : 
+```bash
+sudo apt upgrade
+# Proses upgrade berjalan langsung...
+```
+Setelah proses update dan upgrade selesai, maka sebenarnya kita sudah bisa melakukan instalasi software firefox. Akan tetapi, dikarenakan proses upgrade tadi memakan waktu cukup lama (misalnya 10 menit) dan saya khawatir sesi sudo akan segera habis sebelum instalasi selesai, maka saya menjalankan perintah -v seperti ini :
+```bash
+sudo -v
+```
+Dapat terlihat bahwa sistem tidak mengeluarkan output apa pun dan tidak meminta password. Namun, di balik layar, stempel waktu (timestamp) dan autentikasi saya telah diperbarui sehingga saya punya waktu penuh kembali.
+
+Pada akhirnya, saya bisa menjalankan perintah instalasi dengan tenang tanpa takut terputus oleh permintaan password di tengah jalan : 
+```bash
+sudo apt install firefox
+# Proses instalasi
+```
+**7. -k atau --reset-timestamp** : Opsi ini digunakan untuk menghapus atau membunuh sesi autentikasi sudo kita secara instan. Jika opsi -v berfungsi untuk memperpanjang masa tenggang password, maka -k adalah kebalikannya. Begitu perintah ini dijalankan, sistem akan langsung melupakan bahwa kita baru saja memasukkan password, sehingga perintah sudo berikutnya akan dipaksa untuk meminta konfirmasi password kembali. 
+
+Opsi ini sangat krusial untuk aspek keamanan. Bayangkan ketika kita baru saja selesai menginstal aplikasi menggunakan sudo. Karena sesi sudo masih aktif selama 15 menit ke depan, orang lain yang memegang komputer kita bisa menjalankan perintah administratif tanpa password. Dengan sudo -k, kita mengunci kembali pintu keamanan tersebut secara manual sebelum meninggalkan komputer. 
+
+Sebagai contoh, Misalnya saya baru saja menjalankan perintah sudo dan sesi atutentikasi-nya masih terekam oleh sistem, sehingga sistem tidak meminta password karena saya masih dalam masa tenggang :
+```bash
+sudo whoami
+root
+```
+Dapat terlihat bahwa pada perintah tersebut saya tidak perlu memasukkan password lagi karena saya masih dalam masa tenggang.
+
+Kemudian, saya ingin mengakhiri sesi akses tersebut menggunakan option -k demi keamanan agar tidak bisa disalahgunakan. Maka, saya cukup menjalankan command seperti ini :
+```bash
+sudo -k
+```
+Dapat terlihat bahwa tidak ada output apa pun, namun di balik layar, stempel waktu (timestamp) akses kita telah dihapus total dari memori sistem.
+
+Untuk membuktikannya, saya mencoba menjalankan perintah sudo lagi tepat setelah melakukan -k : 
+```bash
+sudo whoami
+[sudo] password for vandhaffa:
+root
+```
+Dapat terlihat pula bahwa sistem langsung meminta password kembali. Ini membuktikan bahwa sesi sebelumnya telah berhasil dibunuh dan sistem tidak lagi mengingat Anda.
+
+**8. -n atau --non-interactive** : Opsi ini digunakan untuk menjalankan perintah sudo dalam mode non-interaktif. Artinya, Ketika dijalankan, sudo akan memverifikasi apakah user masih memiliki sesi autentikasi yang valid (timestamp belum kedaluwarsa); jika masih valid, perintah akan langsung dijalankan, tetapi jika tidak valid, sudo akan berhenti dan menampilkan pesan error
+
+Sebagai contoh, misalnya saya baru saja menyalakan komputer dan membuka terminal linux, lalu saya mencoba menjalankan perintah dengan opsi -n seperti ini :
+```bash
+sudo -n apt update
+sudo: a password is required
+```
+Dapat terlihat bahwa sistem tidak memberikan kesempatan kepada saya untuk mengetik password. Ia langsung mengeluarkan pesan "a password is required" dan menghentikan proses. Hal ini terjadi karena ketika kita baru saja membuka terminal, kita tidak memiliki sesi autentikasi apa pun yang valid, sehingga mode non-interaktif menolak untuk melanjutkan.
+
+**9. -E atau --preserve-env** : Secara default, sudo akan menghapus atau menolak sebagian besar variabel lingkungan milik user biasa agar tidak memengaruhi proses root. Namun, dengan opsi -E, kita memaksa sistem untuk tetap mempertahankan variabel lingkungan (environment variables) milik penggunHa ketika menjalankan perintah sebagai root.
+
+Sebagai contoh, mari kita bandingkan bagaimana variabel yang kita buat sendiri berperilaku saat menggunakan sudo biasa dan saat menggunakan sudo -E. 
+
+Mula-mula, saya akan membuat variabel baru bernama TESTING_VARIABLE di sesi user biasa seperti ini :
+```bash
+export TESTING_VARIABLE=testing
+```
+Kemudian saya akan memastikan bahwa variabel tersebut sudah terdaftar di lingkungan (environment) saya saat ini menggunakan kombinasi perintah env dan grep seperti ini :
+```bash
+env | grep "TESTING_VARIABLE"
+TESTING_VARIABLE=testing
+```
+Dapat terlihat bahwa pada akun user biasa, variabel tersebut aktif dan terdeteksi dengan benar.
+
+Selanjutnya, saya mencoba melihat apakah root bisa melihat variabel tersebut melalui sudo biasa :
+```bash
+sudo env | grep "TESTING_VARIABLE"
+```
+Dapat terlihat bahwa tidak ada output yang muncul. Ini membuktikan bahwa secara default, sudo melakukan pembersihan keamanan dan membuang variabel lingkungan milik user biasa sebelum menjalankan perintah sebagai root.
+
+Terakhir, saya menjalankan perintah yang sama namun dengan menambahkan opsi -E setelah sudo seperti ini : 
+```bash
+sudo -E env | grep "TESTING_VARIABLE"
+TESTING_VARIABLE=testing
+```
+Dapat terlihat pula bahwa variabel tersebut sekarang muncul di lingkungan root. Dengan kata lain, opsi -E berhasil memaksa sudo untuk mempertahankan atau mengangkut variabel lingkungan milik user vandhaffa ke dalam sesi root.
+
+**10. -g atau --group=group** : Secara default, ketika kita menggunakan sudo, perintah akan dijalankan dengan grup utama milik root. Namun, dengan opsi -g, kita bisa menentukan identitas grup lain yang ada di sistem untuk mengeksekusi perintah tersebut. 
+
+Kita bisa menggunakan perintah `cat /etc/group` untuk melihat informasi mengenai group apa saja yang terdaftar dalam sistem kita seperti ini :
+```bash
+cat /etc/group
+root:x:0:
+daemon:x:1:
+bin:x:2:
+sys:x:3:
+..........dst
+```
+Sebagai contoh, mari kita bandingkan bagaimana sifat group saat kita menjalankan perintah id dengan sudo biasa dan saat kita menjalankan perintah id dengan sudo -g
+
+Mula-mula saya akan menjalankan `sudo id` tanpa opsi tambahan seperti ini :
+```bash
+sudo id
+uid=0(root) gid=0(root) groups=0(root)
+```
+Dapat terlihat bahwa GID (Group ID) yang digunakan adalah 0 (root). Hal ini membuktikkan jika kita menjalankan sudo tanpa opsi tambahan, secara otomatis kita akan menggunakan identitas root sepenuhnya (baik User ID maupun Group ID).
+
+Selanjutnya, saya akan menjalankan perintah yang sama sebagai user saya sendiri (vandhaffa), tetapi menggunakan wewenang dari grup sys (ID 3) seperti ini :
+```bash
+sudo -g sys id
+uid=1000(vandhaffa) gid=3(sys) groups=3(sys),4(adm),24(cdrom),27(sudo),30(dip),46(plugdev),100(users),1000(vandhaffa)
+```
+Dapat terlihat pula bahwa identitas user tetap 1000(vandhaffa), namun GID utamanya telah berubah menjadi 3(sys). Dengan kata lain, opsi -g berhasil meminjam wewenang grup sys untuk menjalankan perintah tersebut.
+
+
+
+
+
+
+
+
+
+
+
+
 
