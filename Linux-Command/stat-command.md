@@ -150,7 +150,7 @@ Inodes: Total: 67108864   Free: 67044023
 ```
 **4. -L atau --dereference** : Ketika menggunakan command stat secara default pada suatu file symlink, stat akan menampilkan informasi symbolic link itu sendiri. Tetapi, dengan -L, stat akan mengikuti symlink dan menampilkan informasi file tujuan sebenarnya.
 
-Contoh (Disini saya mempunyai symlink yang menuju pada suatu file) :
+Sebagai contoh, mari kita bandingkan output penggunaan stat tanpa option L dan penggunaan stat dengan option L pada sebuah file symlink.
 
 Tanpa option L :
 ```bash
