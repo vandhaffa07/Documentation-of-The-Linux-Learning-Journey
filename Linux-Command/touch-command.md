@@ -46,7 +46,9 @@ total 4
 -rw-r--r-- 1 username username 23 Dec 31 09:19 file1.txt
 -rw-r--r-- 1 username username 0 Dec 31 09:22 file2.txt
 ```
-Dapat dilihat bahwa file2.txt telah terbuat karena pada direktori tersebut tidak ada nama file yang sama dengannya. Terlihat juga bahwa file2.txt memiliki size 0, yang berarti file tersebut benar benar kosong atau tidak ada isinya. Selanjutnya saya akan melakukan percobaan menggunakan command touch kepada file yang sudah ada pada direktori tersebut yakni file1.txt. Namun, sebelumnya saya akan melakukan statistik pada file tersebut agar bisa membandingkan perbedaan timestamp-nya :
+Dapat dilihat bahwa file2.txt telah terbuat karena pada direktori tersebut tidak ada nama file yang sama dengannya. Terlihat juga bahwa file2.txt memiliki size 0, yang berarti file tersebut benar benar kosong atau tidak ada isinya. 
+
+Selanjutnya saya akan melakukan percobaan menggunakan command touch kepada file yang sudah ada pada direktori tersebut yakni file1.txt. Namun, sebelumnya saya akan melakukan statistik pada file tersebut agar bisa membandingkan perbedaan timestamp-nya :
 ```bash
 stat file1.txt
   File: file1.txt
