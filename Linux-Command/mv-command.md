@@ -135,7 +135,7 @@ sum = x + y;
 cout << "Sum is: " << sum;
 }
 ```
-Dapat terlihat bahwa file update.conf baru yang ada pada direktori kerja saya saat ini langsung dipindahkan ke dalam folder game tanpa konfirmasi
+Dapat terlihat bahwa file testing.cpp baru yang ada pada direktori kerja saya saat ini langsung dipindahkan ke dalam folder game tanpa konfirmasi
 
 **4. -n atau --no-clobber** : Opsi ini mencegah penimpaan file jika file tujuan sudah ada
 
