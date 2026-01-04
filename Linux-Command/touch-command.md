@@ -1,7 +1,7 @@
 # PERINTAH `touch` PADA LINUX
 
 ## PENGERTIAN
-`touch` command adalah perintah di Linux yang digunakan untuk membuat file kosong serta memanipulasi timestamp (penanda waktu) pada suatu file atau direktori
+`touch` command adalah perintah di Linux yang digunakan untuk membuat file baru yang kosong (jika file belum ada) serta memanipulasi stempel waktu/timestamp (waktu akses dan modifikasi) dari file yang sudah ada 
 
 ---
 
