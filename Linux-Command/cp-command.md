@@ -17,7 +17,7 @@ cp [OPTION] [SUMBER] [TUJUAN]
 ## OPTION
 **1. No option**: Digunakan untuk menyalin file ke lokasi tujuan
 
-Misalnya saya mempunyai sebuah folder bernama "test" yang berisi hanya 1 file seperti ini :
+Sebagai contoh, disini saya mempunyai sebuah folder bernama "test" yang berisi hanya 1 file seperti ini :
 ```bash
 tree test/
 test/
@@ -25,7 +25,7 @@ test/
 
 1 directory, 1 file
 ```
-Selanjutnya, untuk menduplikasi file tersebut di dalam direktori yang sama, saya cukup menjalankan perintah berikut:
+Selanjutnya, saya akan menduplikasi file tersebut di dalam direktori yang sama, maka saya cukup menjalankan perintah berikut:
 ```bash
 cd test/
 ```
