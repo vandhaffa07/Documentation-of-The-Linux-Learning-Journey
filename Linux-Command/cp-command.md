@@ -3,14 +3,14 @@
 ## PENGERTIAN
 Perintah `cp` (*copy*) di Linux digunakan untuk menyalin atau menduplikasi file maupun direktori dari satu lokasi ke lokasi lain.  Perintah ini sangat fundamental dalam manajemen file karena hampir semua aktivitas administrasi sistem melibatkan proses penyalinan data.
 
-⚠️Catatan : Secara default, `cp` hanya menyalin file, unntuk menyalin direktori, harus menggunakan opsi tertentu
+⚠️Catatan : Secara default, `cp` hanya menyalin file, untuk menyalin direktori harus menggunakan opsi tertentu
 
 ---
 
 ## SINTAKS
 Sintaks umum perintah `cp` adalah :
 ```bash
-cp [OPTION] [YANG AKAN DICOPY] [NAMA/TUJUAN HASIL COPY]
+cp [OPTION] [SUMBER] [TUJUAN]
 ```
 ---
 
