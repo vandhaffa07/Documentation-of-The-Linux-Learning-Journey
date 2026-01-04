@@ -113,14 +113,14 @@ int main() {
 ```
 Saya kemudian menjalankan perintah mv dengan menambahkan opsi paksa (-f) :
 ```bash
- mv -f update.conf game/update.conf
+ mv -f testing.cpp belajar_cpp/testing.cpp
 ```
 ```bash
-cat update.conf
-cat: update.conf: No such file or directory
+cat testing.cpp
+cat: testing.cpp: No such file or directory
 ```
 ```bash
-cat game/update.conf
+cat belajar_cpp/testing.cpp
 #include <iostream> 
 using namespace std;
 
