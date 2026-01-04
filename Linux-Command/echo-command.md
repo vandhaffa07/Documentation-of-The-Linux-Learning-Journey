@@ -6,7 +6,7 @@
 ---
 
 ## SINTAKS DASAR
-Sintaks umu perintah `echo` adalah : 
+Sintaks umum perintah `echo` adalah : 
 ```bash
 echo [OPTION] [STRING]
 ```
