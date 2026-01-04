@@ -176,7 +176,7 @@ Dapat dilihat bahwa ctime mengalami perubahan yang sama seperti yang terjadi pad
 
 * ss → Detik (00–59)
 
-Contoh (Disini saya masih menggunakan file1.txt untuk melakukan percobaan) :
+Sebagai contoh mari kita bandingkan timestamp file1.txt sebelum dan sesudah digunakan bersamaan dengan option t
 
 Sebelumnya saya akan menampilkan statistik timestamp dari file tersebut, barulah kemudian saya menggunakan option -t untuk merubah atime dan mtime file1.txt menjadi tanggal kemerdekaan negara Indonesia (17 Agustus 1945 Pukul 10.00 ) :
 ```bash
