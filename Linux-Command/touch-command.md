@@ -22,8 +22,7 @@ touch [OPTIONS] [FILE]
 **ctime (Change Time)** : 
   Waktu terakhir metadata file berubah (misalnya permission, ownership, atau timestamp itu sendiri).
 
-**btime (Birth Time)**  
-  Waktu saat file **pertama kali dibuat** di filesystem.
+**btime (Birth Time)** : Waktu saat file pertama kali dibuat di filesystem.
 
 📚📄 [Sedikit Catatan Mengenai ctime dan mtime](https://github.com/vandhaffa07/Documentation-of-The-Linux-Learning-Journey/blob/main/Linux-Command/ls-command.md#catatan-penting--mtime-dan-ctime-)
 
