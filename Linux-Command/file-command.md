@@ -184,7 +184,85 @@ vandhaffa.vandhaffa: vandhaffa_file
 ```
 Dapat terlihat bahwa database standar kebingungan karena ada kode biner tak dikenal, sehingga ia hanya menyebutnya sebagai "data" mentah. Dapat terlihat pula bahwa saat menggunakan opsi -m, perintah file berhasil mendeteksi identitas kustom yang kita buat karena ia menggunakan referensi dari file mymagic. 
 
-**8. -z atau --uncompress** :
+---
+
+### CATATAN TENTANG MAGIC NUMBER
+Setelah melakukan simulasi di atas, kita bisa menyimpulkan bahwa perintah file tidak bergantung pada ekstensi (seperti .jpg, .pdf, atau .vandhaffa), melainkan pada sebuah magic number.
+
+* Definisi Magic Number
+Magic Number (atau sering disebut File Signature) adalah konstanta numerik atau teks yang terletak pada byte awal sebuah file (offset 0). Kode ini berfungsi sebagai kartu identitas yang memberi tahu sistem operasi jenis data apa yang terkandung di dalam file tersebut.
+
+* Mengapa Magic Number Sangat Penting?
+
+1. Keamanan (Security): Mencegah malware yang mencoba menyamar. Misalnya, sebuah virus bernama gambar.jpg namun memiliki magic number sebuah file executable (EXE). Perintah file akan membongkar penyamaran ini.
+
+2. Identifikasi Akurat: Linux tidak peduli jika Anda mengubah nama file laporan.pdf menjadi laporan.txt. Selama magic number-nya tidak diubah, perintah file akan tetap melaporkannya sebagai PDF.
+
+3. Digital Forensics: Analis forensik menggunakan magic number untuk memulihkan data dari hardisk yang rusak atau terhapus meskipun tabel nama filenya sudah hilang.
+[DAFTAR MAGIC NUMBER/SIGNATURE FILE](https://en.wikipedia.org/wiki/List_of_file_signatures)
+
+---
+
+## LANJUTAN PENJELASAN OPTION
+**8. -s atau --special-files** : Secara default, perintah file tidak akan mencoba membaca isi dari "special files" (seperti file perangkat di direktori /dev/). Hal ini dilakukan untuk menghindari risiko gangguan pada perangkat keras. Namun, dengan opsi -s, kita memerintahkan file untuk mengabaikan peringatan tersebut dan mencoba membaca isinya guna mengidentifikasi tipe datanya.
+
+Sebagai contoh, kita akan membandingkan hasil pengecekan pada disk drive (partisi hardisk) menggunakan perintah biasa dengan menggunakan opsi -s.
+
+Di Linux, semua perangkat keras direpresentasikan sebagai file. Saat ini kita akan mencoba mengecek file yang merepresentasikan seluruh harddisk pertama saya, yakni /dev/sda menggunakan command file biasa seperti ini :
+```bash
+file /dev/sda
+/dev/sda: block special (8/0)
+```
+Dapat terlihat bahwa sistem hanya memberitahu kita jenis filenya saja (yaitu block special), tetapi ia tidak berani mengintip apa isi di dalam hardisk tersebut (seperti sistem filenya atau tabel partisinya).
+
+Akan tetapi, ketika kita menambahkan opsi -s setelah command file seperti ini( Catatan : Kita mungkin membutuhkan perintah sudo karena ini adalah akses langsung ke perangkat keras ) :
+```bash
+sudo file -s /dev/sda
+/dev/sda: Linux rev 1.0 ext2 filesystem data, UUID=00000000-0000-0000-0000-000000000000 (extents) (large files) (huge files)
+```
+Maka, dapat terlihat bahwa dengan opsi -s, perintah file berani membaca isi dari piringan hardisk tersebut
+
+### PENJELASAN OUTPUT
+
+* Identitas Perangkat: /dev/sda 
+  
+Karena saya menggunakan WSL, /dev/sda bukanlah fisik SSD asli bawaan laptop saya, melainkan sebuah file disk virtual (kontainer) yang disediakan oleh Windows. File ini bertindak sebagai rumah bagi seluruh sistem operasi Linux di dalam Windows saya. Segala sesuatu yang saya lakukan di dalam terminal Linux tersimpan di dalam file virtual ini.
+
+* Pondasi Struktur: Linux rev 1.0 
+  
+Disk virtual ini dibangun dengan model struktur penyimpanan data Revisi 1.0. Ini adalah standar modern yang sangat fleksibel. Artinya, meskipun ini adalah lingkungan simulasi/virtual, fondasinya sudah siap untuk mendukung fitur-fitur canggih seperti penyimpanan file berukuran besar.
+
+* Sistem Pengelola: ext2 filesystem data
+  
+Di dalam kontainer virtual ini, data diatur oleh sistem bernama ext2. Mengapa ext2? Di lingkungan WSL, sistem ini dipilih karena sangat ringan dan cepat. Ia tidak memiliki "catatan harian" (journaling). Karena ini adalah disk virtual di atas Windows, Windows-lah yang biasanya menjaga keamanan datanya, sehingga Linux tidak perlu lagi repot-repot membuat catatan harian sendiri yang bisa memperlambat performa.
+
+* Identitas Unik: UUID=000...
+  
+Nomor identitas unik (UUID) ini isinya nol semua karena ini adalah perangkat virtual. Di WSL, Windows membuatkan sistem file ini secara otomatis dan cepat tanpa merasa perlu memberikan ID yang unik. Bagi Linux di dalam WSL, identitas ini tidak terlalu penting karena jalurnya sudah diatur secara permanen oleh Windows.
+
+* Fitur : (extents), (large files), (huge files)
+
+Meskipun bersifat virtual dan sederhana, disk ini mempunyai beberapa fitur hebat, yakni Extents(Membaca data secara berurutan agar akses file jadi lebih cepat (tidak lemot)) serta Large & Huge Files(Menyimpan file satu per satu dengan ukuran yang sangat besar (bahkan hingga hitungan Terabyte) di dalam WSL saya, selama SSD asli laptop saya masih punya sisa ruang)
+
+**9. -z atau --uncompresed** : Secara default, jika kita menjalankan perintah file pada file yang dikompres (seperti .gz, .bz2, atau .zip), sistem hanya akan melaporkan bahwa file tersebut adalah data terkompresi. Namun, dengan opsi -z, perintah file akan mencoba melihat ke dalam file kompresi tersebut dan melaporkan tipe file asli yang ada di dalamnya.
+
+Sebagai contoh, kita akan mencoba membandingkan pengecekan pada sebuah file teks yang sudah dikompres menjadi format .gz dengan menggunakan command file biasa dan command file -z 
+
+Mula-mula, kita buat terlebih dahulu sebuah file teks sederhana lalu kita kompres menggunakan perintah gzip seperti ini :
+```bash
+echo "Ini adalah catatan rahasia" > rahasia.txt && gzip rahasia.txt
+```
+Selanjutnya, saya akan menggunakan command file biasa kepada file kompresi tersebut seperti ini :
+```bash
+file rahasia.txt.gz
+rahasia.txt.gz: gzip compressed data, was "rahasia.txt", last modified: Mon Jan  5 10:27:59 2026, from Unix, original size modulo 2^32 27
+```
+Dapat terlihat bahwa command file tanpa tambahan opsi apapun hanya memberitahu kita informasi tentang pembungkusnya saja, yaitu bahwa file ini adalah data yang dikompres dengan gzip. Berbeda halnya, dengan jika kita menambahkan opsi -z seperti ini :
+```bash
+file -z rahasia.txt.gz
+rahasia.txt.gz: ASCII text (gzip compressed data, was "rahasia.txt", last modified: Mon Jan  5 10:27:59 2026, from Unix)
+```
+Dapat terlihat bahwa di bagian awal output, sistem kini melaporkan ASCII text. Ini membuktikan bahwa opsi -z berhasil mendeteksi bahwa isi di dalam bungkus gzip tersebut adalah sebuah file teks biasa.
 
 
 
