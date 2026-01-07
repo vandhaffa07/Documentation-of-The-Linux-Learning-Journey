@@ -51,4 +51,71 @@ find . -iname "laporan.txt"
 ```
 Dapat terlihat bahwa perintah ini menampilkan kedua file tersebut meskipun salah satunya menggunakan huruf besar semua sedangkan satunya lagi menggunakan huruf kecil semua. Hal ini membuktikan bahwa Kriteria -iname memperlakukan "L" dan "l" sebagai karakter yang sama(case-insensitive)
 
+**3. -type** : Kriteria ini digunakan untuk memfilter pencarian berdasarkan jenis filenya
+
+Berikut adalah daftar lengkap simbol tipe file yang didukung oleh kriteria -type:
+
+| Simbol | Jenis File | Penjelasan Singkat |
+| :--- | :--- | :--- |
+| **f** | Regular File | File biasa seperti dokumen teks, gambar, video, atau eksekusi biner. |
+| **d** | Directory | Folder yang berisi daftar nama file lain. |
+| **l** | Symbolic Link | File penunjuk atau shortcut yang mengarah ke lokasi file lain. |
+| **b** | Block Special | Perangkat keras penyimpan data dalam blok (seperti Hardisk/Flashdisk). |
+| **c** | Character Special | Perangkat yang mengirim data karakter per karakter (seperti Keyboard/Terminal). |
+| **p** | Named Pipe (FIFO) | Saluran komunikasi antar dua proses (First-In-First-Out). |
+| **s** | Socket | Titik komunikasi untuk pertukaran data antar proses (jaringan/sistem lokal). |
+
+Sebagai contoh, saya akan membuat berbagai jenis tipe file di dalam sebuah folder, lalu saya akan menggunakan find dengan kriteria -type untuk membedah beberapa simbolnya satu per satu.
+
+Mula-mula, saya akan menyiapkan bahan percobaannya terlebih dahulu dengan membuat folder, file reguler, dan symlink menggunakan serangkaian perintah berikut:
+```bash
+mkdir folder_tes && touch file_biasa.txt
+```
+```bash
+ln -s file_biasa.txt ini_link
+```
+```bash
+ls
+file_biasa.txt  folder_tes  ini_link
+```
+Dapat terlihat bahwa kita sekarang memiliki 3 file dengan tipe yang berbeda-beda dalam satu direktori.
+
+Sebagai langkah awal, kita akan coba instruksikan find untuk melacak direktoi menggunakan kriteria -type d. Maka, seharusnya output yang muncul hanyalah folder_tes dan direktori saat ini (.), untuk mencobanya, kita bisa menggunakan perintah seperti ini :
+```bash
+find . -type d
+.
+./folder_tes
+```
+Dapat terlihat bahwa memang benar, hanya nama folder yang muncul pada output tersebut (termasuk titik . yang menandakan direktori saat ini). Hal ini membuktikan bahwa -type d berhasil dijalankan dengan cara mengeliminasi file-file lainnya karena tidak memenuhi syarat sebagai sebuah folder.
+
+Beranjak ke kebutuhan yang lebih umum, kita akan mencoba memfilter file reguler dengan kriteria -type f. Logikanya, hasil yang keluar seharusnya hanyalah file_biasa.txt, untuk mencobanya, kita bisa menggunakan perintah seperti ini :
+```bash
+find . -type f
+./file_biasa.txt
+```
+Dapat terlihat bahwa meskipun di sana terdapat banyak tipe dengan nama yang beragam, hanya file regulerlah yang ditampilkan. Ini membuktikan kriteria kita berhasil membedakan file data dari tipe-tipe lainnya.
+
+Selanjutnya, kita akan menguji kemampuan find dalam melacak symbolic link bernama ini_link yang sebelumnya telah kita buat. Maka kita bisa menggunakan perintah seperti ini : 
+```bash
+ find . -type l
+./ini_link
+```
+Dapat terlihat bahwa find dengan sigap mengidentifikasi tautan simbolis tersebut. Kemampuan ini sangat krusial bagi kita saat harus memetakan dependensi antar file di sistem yang kompleks.
+
+Sebagai penutup percobaan ini, kita akan melompat ke wilayah sistem /dev untuk mencari perangkat keras penyimpanan (block device) dengan kriteria -type b. Seperti yang kita pahami pada dokumentasi sebelumnya mengenai [special file](https://github.com/vandhaffa07/Documentation-of-The-Linux-Learning-Journey/blob/main/Linux-Command/file-command.md#:~:text=8.%20%2Ds%20atau%20%2D%2Dspecial%2Dfiles) direktori /dev berisi file khusus yang berfungsi sebagai antarmuka ke perangkat keras fisik. Oleh karena itu, secara logika seharusnya output dari perintah ini akan menampilkan daftar file perangkat seperti sda, sdb, loop, dan sejenisnya:
+```bash
+sudo find /dev -type b
+/dev/sdd
+/dev/sdc
+/dev/sdb
+/dev/sda
+/dev/loop7
+/dev/loop6
+...........dst
+```
+Dapat terlihat bahwa prediksi kita kembali terbukti secara akurat. Dengan kriteria ini, kita berhasil membedah isi /dev dan hanya mengambil file yang merepresentasikan perangkat penyimpanan blok. Perintah find secara cerdas mengabaikan file karakter (character devices) seperti terminal atau sensor, dan hanya menyajikan daftar hardware penyimpanan yang kita butuhkan.
+
+
+
+
 
