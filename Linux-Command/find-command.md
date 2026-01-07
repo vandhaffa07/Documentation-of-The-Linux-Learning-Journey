@@ -115,6 +115,59 @@ sudo find /dev -type b
 ```
 Dapat terlihat bahwa prediksi kita kembali terbukti secara akurat. Dengan kriteria ini, kita berhasil membedah isi /dev dan hanya mengambil file yang merepresentasikan perangkat penyimpanan blok. Perintah find secara cerdas mengabaikan file karakter (character devices) seperti terminal atau sensor, dan hanya menyajikan daftar hardware penyimpanan yang kita butuhkan.
 
+**4. -size** : Kriteria ini digunakan untuk memfilter file berdasarkan ukurannya. 
+
+**Satu hal krusial yang harus kita pahami adalah penggunaan operator unit dan simbol arah pada nilainya yakni :**
+
+* (+): Untuk mencari file yang lebih besar dari nilai tersebut.
+
+* (-) : Untuk mencari file yang lebih kecil dari nilai tersebut.
+
+* Tanpa Simbol : Untuk mencari ukuran yang persis.
+  
+**Unit Ukuran yang Kita Gunakan :**
+
+* c : Bytes
+
+* k : Kilobytes
+
+* M : Megabytes
+
+* G : Gigabytes
+
+Sebagai simulasi, kita akan menciptakan beberapa file dengan bobot yang berbeda untuk menguji seberapa akurat kriteria -size pada find bekerja.
+
+Mula-mula, kita siapkan bahan percobaan menggunakan perintah truncate. Kita akan membuat tiga file dengan ukuran yang sangat kontras yakni 1MB, 10MB, dan 100MB :
+```bash
+truncate -s 1M kecil.dat && truncate -s 10M sedang.dat && truncate -s 100M besar.dat
+```
+```bash
+ls -lh
+total 0
+-rw-r--r-- 1 vandhaffa vandhaffa 100M Jan  7 17:29 besar.dat
+-rw-r--r-- 1 vandhaffa vandhaffa 1.0M Jan  7 17:29 kecil.dat
+-rw-r--r-- 1 vandhaffa vandhaffa  10M Jan  7 17:29 sedang.dat
+```
+Dapat terlihat bahwa kita sekarang memiliki tiga target dengan rentang ukuran 1MB, 10MB, dan 100MB.
+
+Mari kita mulai pengujiannya, sebagai langkah awal, saya akan mencoba instruksikan find untuk melacak file yang ukurannya lebih besar dari 50MB menggunakan kriteria -size +50M seperti ini : 
+```bash
+find . -size +50M
+./besar.dat
+```
+Dapat terlihat bahwa hanya file besar.dat yang ditampilkan karena ia memiliki ukuran sebesar 100MB, dapat terlihat pula bahwa file-file lainnya seperti sedang.dat dan kecil.dat otomatis tereliminasi karena tidak memenuhi ambang batas minimal yang kita tentukan.
+
+Beranjak ke percobaan berikutnya, kita ingin mencari file yang lebih kecil dari 5MB dengan kriteria -size -5M. Maka, seharusnya output yang kita dapatkan hanyalah kecil.dat seperti ini :
+```bash
+find . -size -5M
+./kecil.dat
+```
+Kita juga bisa menggunakan rentang ukuran untuk mencari sebuah file dengan cara menggabungkan dua kriteria -size sekaligus. Misalnya, kita ingin mencari file yang ukurannya lebih besar dari 5MB tapi tidak lebih dari 20MB. Secara logika, hanya sedang.dat lah yang masuk dalam kriteria ini:
+```bash
+find . -size +5M -size -20M
+./sedang.dat
+```
+Dapat terlihat bahwa prediksi kita tepat. Perintah ini akan menyaring semua file, membuang yang terlalu kecil dan menyingkirkan yang terlalu besar, hingga menyisakan target yang kita inginkan.
 
 
 
