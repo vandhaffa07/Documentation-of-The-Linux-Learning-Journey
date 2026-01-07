@@ -169,6 +169,120 @@ find . -size +5M -size -20M
 ```
 Dapat terlihat bahwa prediksi kita tepat. Perintah ini akan menyaring semua file, membuang yang terlalu kecil dan menyingkirkan yang terlalu besar, hingga menyisakan target yang kita inginkan.
 
+**5. -mtime, -atime, dan -ctime** : Kriteria ini digunakan untuk melacak jejak waktu sebuah file(timestamp)
+
+Sama seperti kriteria ukuran, kita akan menggunakan operator + ( untuk lebih lama dari ) dan - (untuk lebih baru dari ). Angka yang kita masukkan di sini hitungannya adalah hari.
+
+Agar kita bisa melihat perbedaannya secara nyata, kita akan memanipulasi waktu pembuatan file agar ada yang terlihat seperti file lama dan ada yang file baru
+
+Mula-mula, kita buat 3 file dengan waktu modifikasi yang berbeda menggunakan bantuan perintah touch -d seperti ini :
+```bash
+touch -d "5 days ago" file_lama.log && touch -d "2 days ago" file_sedang.log && touch baru_banget.log
+```
+Sekarang, kita verifikasi jejak waktunya agar kita bisa memastikan apakah timestamp masing-masing file telah sesuai dengan yang kita inginkan menggunakan command stat -c seperti ini : 
+```bash
+stat -c "%x- %y %z" file_lama.log && stat -c "%x- %y %z" file_sedang.log && stat -c "%x- %y %z" baru_banget.log
+2026-01-02 18:51:43.753077175 +0700- 2026-01-02 18:51:43.753077175 +0700 2026-01-07 18:51:43.750663965 +0700
+2026-01-05 18:51:43.759252625 +0700- 2026-01-05 18:51:43.759252625 +0700 2026-01-07 18:51:43.754663965 +0700
+2026-01-07 18:51:43.762663964 +0700- 2026-01-07 18:51:43.762663964 +0700 2026-01-07 18:51:43.762663964 +0700
+```
+(Catatan : Saya membuat catatan ini pada tanggal 7 Januari 2026)
+
+Dapat terlihat bahwa kita sekarang punya koleksi file dengan rentang waktu yang berbeda-beda. Mari kita mulai eksperimennya.
+
+Misalnya, kita ingin mencari file yang sudah dimodifikasi lebih dari 3 hari yang lalu. Maka kita gunakan kriteria -mtime +3 seperti ini :
+```Bash
+find . -mtime +3
+./file_lama.log
+```
+Dapat terlihat bahwa find hanya memunculkan file_lama.log. Hal ini terjadi karenafile tersebut usianya sudah 5 hari yang artinya melewati ambang batas 3 hari yang kita tentukan.
+
+Bagaimana jika kasusnya kita baru saja mengedit sebuah file tapi lupa namanya? Kita bisa mencari file yang dimodifikasi kurang dari 1 hari terakhir dengan kriteria -mtime -1 seperti ini :
+```bash
+find . -mtime -1
+./baru_banget.log
+```
+Dapat terlihat bahwa find  menunjukkan file yang baru saja kita buat. Ini adalah cara tercepat untuk menemukan pekerjaan terakhir kita di tengah ribuan file lainnya.
+
+**6. -user dan -group** : Kriteria ini digunakan untuk menyaring file berdasarkan identitas pemiliknya (User) atau kelompoknya (Group).
+
+Sebagai contoh, disini kita akan melihat bagaimana cara find mengenali file milik user kita saat ini dan file milik user root.
+
+Mula-mula, kita buat sebuah file di direktori kerja kita dan kita cek siapa pemilik aslinya:
+```bash
+stat -c "%U %u %G %g" file_saya.txt
+vandhaffa 1000 vandhaffa 1000
+```
+Dapat terlihat bahwa file tersebut dimiliki oleh username dan group saya, yakni vandhaffa
+
+Sekarang, mari kita instruksikan find untuk mencari semua file di direktori saat ini yang dimiliki oleh user vandhaffa menggunakan kriteria -user seperti ini :
+```bash
+ find . -user vandhaffa
+./file_sedang.log
+./baru_banget.log
+./file_lama.log
+./file_saya.txt
+```
+Dapat terlihat bahwa find hanya menampilkan file yang memang terdaftar atas nama kita(termasuk file-file yang kita gunakan pada percobaan kriteria sebelumnya karena saya menggunakan direktori yang sama untuk percobaan kali ini)
+
+Selanjutnya, mari kita mencoba untuk mencari file di folder sistem /etc yang dimiliki oleh user root. Karena ini folder sistem, kita akan gunakan sudo seperti ini:
+```bash
+/etc
+/etc/pulse
+/etc/pulse/client.conf
+/etc/pulse/client.conf.d
+/etc/login.defs
+/etc/apt
+/etc/apt/sources.list.save
+............................dst
+```
+Dapat terlihat bahwa outputnya akan dipenuhi oleh file-file yang digunakan untuk keperluan sistem operasi
+
+Hal yang sama juga berlaku untuk kelompok atau grup. Jika kita ingin mencari file berdasarkan grupnya, kita tinggal menggunakan kriteria -group seperti ini :
+```bash
+find . -group vandhaffa
+./file_sedang.log
+./baru_banget.log
+./file_lama.log
+./file_saya.txt
+```
+
+**7. -perm** : Kriteria ini digunakan untuk memfilter file berdasarkan hak aksesnya. Sebagai praktisi Linux, kita tahu bahwa keamanan sistem sangat bergantung pada pengaturan izin yang tepat (seperti 755, 644, atau 777). Dengan kriteria ini, kita bisa mendeteksi file mana saja yang mungkin terlalu "terbuka" dan berbahaya bagi sistem. [Catatan Tentang Permission](https://github.com/vandhaffa07/Documentation-of-The-Linux-Learning-Journey/blob/main/Linux-Command/mkdir-command.md#konsep-permission-pada-direktori-dan-file-linux)
+
+Mari kita buat simulasi dengan mengatur beberapa file agar memiliki izin yang berbeda-beda, lalu kita akan mencoba mencarinya menggunakan find -perm.
+
+Mula-mula, kita siapkan 3 file berbeda dan kita atur izinnya menggunakan perintah chmod seperti ini :
+```bash
+touch rahasia.txt umum.txt skrip.sh && chmod 600 rahasia.txt && chmod 644 umum.txt && chmod 755 skrip.sh
+```
+
+Sekarang, mari kita verifikasi dulu izin aksesnya agar kita punya gambaran yang jelas:
+```bash
+stat -c "%a %A" rahasia.txt &&  stat -c "%a %A" umum.txt &&  stat -c "%a %A" skrip.sh
+600 -rw-------
+644 -rw-r--r--
+755 -rwxr-xr-x
+```
+Dapat terlihat bahwa kita sekarang memiliki file dengan izin yang bervariasi. Mari kita coba lacak satu per satu.
+
+Misalnya, kita ingin mencari file yang sangat privat, yaitu file yang memiliki izin 600 (hanya pemilik yang punya akses). Kita gunakan kriteria -perm 600 seperti ini : 
+```bash
+find . -perm 600
+./rahasia.txt
+```
+Dapat terlihat bahwa find hanya menampilkan rahasia.txt dan ini memang sesuai dengan izin akses yang kita atur pada file tersebut
+
+Selanjutnya, kita akan mencoba mencari file yang bisa dieksekusi oleh semua orang, yakni yang memiliki izin 755. Maka kita bisa menggunakan perintah seperti ini :
+```bash
+find . -perm 755
+./skrip.sh
+```
+
+
+
+
+
+
 
 
 
