@@ -102,7 +102,7 @@ Selanjutnya, kita akan menguji kemampuan find dalam melacak symbolic link bernam
 ```
 Dapat terlihat bahwa find dengan sigap mengidentifikasi tautan simbolis tersebut. Kemampuan ini sangat krusial bagi kita saat harus memetakan dependensi antar file di sistem yang kompleks.
 
-Sebagai penutup percobaan ini, kita akan melompat ke wilayah sistem /dev untuk mencari perangkat keras penyimpanan (block device) dengan kriteria -type b. Seperti yang kita pahami pada dokumentasi sebelumnya mengenai [special file](https://github.com/vandhaffa07/Documentation-of-The-Linux-Learning-Journey/blob/main/Linux-Command/find-command.md#:~:text=8.%20%2Ds%20atau%20%2D%2Dspecial%2Dfiles) direktori /dev berisi file khusus yang berfungsi sebagai antarmuka ke perangkat keras fisik. Oleh karena itu, secara logika seharusnya output dari perintah ini akan menampilkan daftar file perangkat seperti sda, sdb, loop, dan sejenisnya:
+Sebagai penutup percobaan ini, kita akan melompat ke wilayah sistem /dev untuk mencari perangkat keras penyimpanan (block device) dengan kriteria -type b. Seperti yang kita pahami pada dokumentasi sebelumnya mengenai [special file](https://github.com/vandhaffa07/Documentation-of-The-Linux-Learning-Journey/blob/main/Linux-Command/file-command.md#lanjutan-penjelasan-option) direktori /dev berisi file khusus yang berfungsi sebagai antarmuka ke perangkat keras fisik. Oleh karena itu, secara logika seharusnya output dari perintah ini akan menampilkan daftar file perangkat seperti sda, sdb, loop, dan sejenisnya:
 ```bash
 sudo find /dev -type b
 /dev/sdd
