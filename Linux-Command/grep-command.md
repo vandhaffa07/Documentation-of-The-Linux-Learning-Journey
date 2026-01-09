@@ -72,11 +72,18 @@ Dapat dilihat bahwa seluruh variasi penulisan kata Linux berhasil ditemukan. Hal
 
 **3. -n atau --line-number** : Opsi ini digunakan untuk menampilkan nomor baris dari setiap baris yang cocok dengan pola pencarian. Informasi ini sangat berguna ketika kita perlu mengetahui lokasi pasti suatu teks di dalam file, misalnya saat menelusuri error pada log atau source code.
 
+Sebagai contoh, saya akan menyimulasikan bagaimana opsi ini bekerja pada suatu file log imajiner yang saya buat sendiri 
 
-
-
-
-
+Mula-mula, saya akan membuat bahan percobaan berupa sebuah file log sederhana bernama app.log yang berisi beberapa baris aktivitas sistem seperti ini :
+```bash
+cat > app.log 
+[INFO] Application started
+[INFO] Connecting to database
+[WARNING] Connection is slow
+[ERROR] Database connection failed
+[INFO] Retrying connection
+[ERROR] Retry failed
+```
 
 
 
