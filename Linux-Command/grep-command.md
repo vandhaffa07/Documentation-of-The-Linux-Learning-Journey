@@ -84,6 +84,15 @@ cat > app.log
 [INFO] Retrying connection
 [ERROR] Retry failed
 ```
+Setelah file berhasil dibuat, saya akan mencoba menggunakan perintah grep dengan option -n untuk menampilkan baris yang mengandung kata "ERROR" beserta nomor baris yang mengandung kata tersebut :
+```bash
+grep -n ERROR app.log
+4:[ERROR] Database connection failed
+6:[ERROR] Retry failed
+```
+Dapat terlihat bahwa grep secara cerdas memberikan output yang presisi kepada kita. Kita tidak hanya tahu bahwa terjadi kesalahan/error pada file tersebut, sebaliknya,kita malah tahu persis bahwa masalah tersebut tercatat pada baris ke-4 dan baris ke-6.
+
+
 
 
 
