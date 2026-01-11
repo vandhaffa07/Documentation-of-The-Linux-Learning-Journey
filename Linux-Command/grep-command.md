@@ -168,3 +168,70 @@ grep -c "SUCCESS" transaksi.txt
 ```
 Dapat terlihat bahwa grep tidak lagi menampilkan detail isi barisnya secara panjang lebar, melainkan langsung memberikan informasi angka yang presisi mengenai total temuan yang cocok. Dengan cara ini, saya bisa langsung mengetahui bahwa ada 3 transaksi sukses tanpa harus menghitungnya secara manual satu per satu di layar terminal.
 
+**7. -l atau --files-with-matches** : Opsi ini digunakan jika kita ingin mengetahui nama file mana saja yang mengandung pola tertentu, tanpa perlu melihat isi teks di dalamnya.
+
+**Contoh :**
+
+Mula-mula, saya akan membuat 2 buah file bernama tugas_sekolah.txt dan catatan_harian.txt sebagai bahan percobaan opsi ini
+```bash
+cat > tugas_sekolah.txt
+Linux adalah sistem operasi (OS) sumber terbuka (open source) berbasis Unix yang gratis, fleksibel, dan kuat
+Belajar Linux sangat menyenangkan
+```
+```bash
+cat > catatan_harian.txt
+Hari ini cuaca sangat cerah.
+Waktunya pergi lari pagi di taman.
+```
+Setelah kedua file berhasil dibuat, saya ingin mencari file mana yang membahas dan mengandung kata "Linux" menggunakan opsi -l seperti ini :
+```bash
+grep -l "Linux" tugas_sekolah.txt catatan_harian.txt
+tugas_sekolah.txt
+```
+Dapat terlihat bahwa grep tidak menampilkan baris mana yang mengandung kata "Linux" melainkan hanya menampilkan nama file yang mengandung kata tersebut. Hal ini sangat memudahkan kita ketika harus mencari satu kata kunci di tengah puluhan file tanpa perlu melihat seluruh isi teksnya.
+
+**8. -L atau --files-without-matches** : Opsi ini adalah kebalikan dari -l. Jika -l menampilkan nama file yang mengandung pola atau kata tertentu, maka opsi ini malah menampilkan nama file yang tidak mengandung kata atau pola tertentu.
+
+**Contoh :**
+
+Disini saya tetap menggunakan 2 file yang sudah saya buat tadi (tugas_sekolah.txt dan catatan_harian.txt) untuk melakukan percobaan.
+
+Kali ini saya ingin mencari tahu file mana yang tidak ada kata "Linux"-nya menggunakan opsi -L seperti ini :
+```bash
+grep -L "Linux" tugas_sekolah.txt catatan_harian.txt
+catatan_harian.txt
+```
+Dapat terlihat bahwa grep secara cerdas mengabaikan file yang mengandung kata "Linux"(tugas_sekolah.txt) dan justru menampilkan file yang tidak memiliki kata tersebut. 
+
+**9. -r atau --recursive** : Opsi ini digunakan untuk mencari sebuah pola kata tidak hanya di 1 file, tapi di seluruh file yang ada di dalam sebuah folder, termasuk folder-folder di dalamnya (sub-direktori).
+
+**Contoh :**
+
+Misalnya, saya mempunyai struktur folder seperti ini :
+```bash
+tree Proyek_Web/
+Proyek_Web/
+├── Aset
+│   └── style.css
+└── index.html
+
+2 directories, 2 files
+```
+```bash
+cat Proyek_Web/index.html
+<html><body>Selamat Datang di Linux!</body></html>
+```
+```bash
+cat Proyek_Web/Aset/style.css
+body { background: white; }
+```
+Selanjutnya, saya ingin mencari kata "Linux" di seluruh isi folder Proyek_Web. Dengan option -r, kita tidak perlu repot membuka satu per satu folder secara manual yang notabenya memakan waktu cukup lama, kita hanya perlu menuliskan direktori induk file-file tersebut berada, seperti ini :
+```bash
+grep -r "Linux" Proyek_Web/
+Proyek_Web/index.html:<html><body>Selamat Datang di Linux!</body></html>
+```
+Dapat terlihat bahwa grep secara cerdas hanya menampilkan baris yang mengandung kata "Linux" beserta alamat file tempat ia ditemukan.
+
+
+
+
