@@ -17,7 +17,7 @@ grep [OPTION][POLA][FILE]
 
 **1. No Option** : Tanpa menggunakan tambahan opsi apa pun, grep akan bekerja secara case-sensitive (disiplin terhadap huruf besar dan kecil). Pada kondisi default ini, grep hanya akan mencocokkan pola teks yang penulisan hurufnya benar-benar sama, termasuk kapitalisasi. Dalam mode ini juga, grep dapat digunakan untuk mencari pola pada satu file maupun banyak file sekaligus.
 
-Sebagai contoh, saya akan menyiapkan beberapa file percobaan yang memiliki isi teks serupa, tetapi berbeda dalam penggunaan huruf kapital untuk memahami perilaku case-sensitive pada command grep
+**Contoh :**
 
 Mula-mula, saya akan membuat 3 file teks percobaan dengan variasi penulisan kata Linux seperti ini : 
 ```bash
@@ -54,7 +54,9 @@ Dapat terlihat bahwa pada pencarian multi-file, grep secara otomatis menampilkan
 
 **2. -i atau --ignore-case**: Opsi ini digunakan untuk mengabaikan perbedaan huruf besar dan kecil (case-insensitive). Dengan opsi ini, grep tidak lagi membedakan antara huruf kapital dan huruf kecil, sehingga pola pencarian akan dianggap sama meskipun penulisannya berbeda.
 
-Sebagai contoh, masih menggunakan file file1.txt, file2.txt, dan file3.txt yang telah dibuat sebelumnya, saya akan mencoba mencari pola linux dengan mengaktifkan opsi -i, seperti ini:
+**Contoh** :
+
+Disini, saya masih menggunakan file file1.txt, file2.txt, dan file3.txt yang telah dibuat sebelumnya, saya akan mencoba mencari pola linux dengan mengaktifkan opsi -i, seperti ini:
 ```bash
 grep -i linux file1.txt
 Belajar Linux itu seru
@@ -90,15 +92,79 @@ grep -n ERROR app.log
 4:[ERROR] Database connection failed
 6:[ERROR] Retry failed
 ```
-Dapat terlihat bahwa grep secara cerdas memberikan output yang presisi kepada kita. Kita tidak hanya tahu bahwa terjadi kesalahan/error pada file tersebut, sebaliknya,kita malah tahu persis bahwa masalah tersebut tercatat pada baris ke-4 dan baris ke-6.
+Dapat terlihat bahwa grep dengan option -n memberikan informasi presisi mengenai letak kata "ERROR" pada file tersebut, yakni pada baris ke-4 dan ke-6
+
+**4. -v atau --invert-match** : Opsi ini berbeda dengan perintah grep pada umumnya. Alih-alih menampilkan baris yang cocok dengan pola yang kita tentukan, opsi ini justru akan menampilkan semua baris yang tidak mengandung pola yang kita tentukan.
+
+**Contoh :**
+
+Disini saya akan menyimulasikan bagaimana opsi ini bekerja pada file log imajiner bernama app.log yang telah saya buat pada penjelasan sebelumnya. berikut adalah isi file app.log :
+```bash
+cat -n app.log
+     1  [INFO] Application started
+     2  [INFO] Connecting to database
+     3  [WARNING] Connection is slow
+     4  [ERROR] Database connection failed
+     5  [INFO] Retrying connection
+     6  [ERROR] Retry failed
+```
+Selanjutnya, saya akan mencari baris yang tidak mengandung kata "INFO" pada file tersebut menggunakan perintah seperti ini :
+```bash
+grep -v INFO app.log
+[WARNING] Connection is slow
+[ERROR] Database connection failed
+[ERROR] Retry failed
+```
+Dapat terlihat bahwa grep hanya menyaring baris yang mengandung kata ERROR dan WARNING saja. Hal ini membantu kita untuk membersihkan terminal dari informasi yang tidak relevan, sehingga mempermudah kita dalam proses pemantauan (monitoring).
+
+**5. -w atau --word-regexp** : Digunakan untuk mencari kata yang benar-benar utuh (whole word). Dengan kriteria ini, grep tidak akan mengambil baris di mana pola yang kita tentukan hanya menjadi bagian dari kata yang lebih panjang, sebuah baris hanya akan dianggap cocok oleh grep jika pola tersebut diapit oleh spasi, tanda baca, atau berada di awal/akhir baris.
+
+**Contoh :**
+
+Mula-mula, saya akan membuat bahan percobaan berupa file teks bernama akses.txt yang berisi campuran kata-kata serupa seperti ini :
+```bash
+cat > akses.txt
+Akses ke log sistem
+User sedang login
+User sedang logout
+Lihat log harian
+```
+Setelah file berhasil dibuat, saya akan menggunakan grep tanpa tambahan opsi apapun untuk mencari baris yang mengandung kata "log" seperti ini :
+```bash
+grep "log" akses.txt
+Akses ke log sistem
+User sedang login
+User sedang logout
+Lihat log harian
+```
+Dapat terlihat bahwa semua baris pada file tersebut muncul di terminal. Hal ini terjadi karena di dalam kata "login" dan "logout" terdapat pola huruf "log" yang sama, sehingga bagi grep grep default, hal ini dianggap sebagai kecocokan yang sah.
+
+Berbeda dengan ketika menggunakan option -w seperti ini :
+```bash
+grep -w "log" akses.txt
+Akses ke log sistem
+Lihat log harian
+```
+Dapat terlihat bahwa baris "login" dan "logout" kini telah tereliminasi dan tidak ditampilkan pada terminal. Hal ini terjadi karena grep -w secara cerdas menyaring hasil dan hanya menyisakan baris di mana "log" muncul sebagai satu kata utuh yang berdiri sendiri tanpa menempel pada huruf lainnya.
 
 
+**6. -c atau --count** : Opsi ini digunakan untuk menghitung jumlah baris yang cocok dengan pola pencarian yang kita tentukan. Dengan opsi ini, grep tidak akan menampilkan isi teks dari baris tersebut, melainkan hanya memberikan angka total dari temuannya.
 
+**Contoh :**
 
-
-
-
-
-
-
+Mula-mula, saya akan membuat file percobaan bernama transaksi.txt yang menampung data imajiner riwayat pembelian menggunakan command cat seperti ini :
+```bash
+cat > transaksi.txt 
+[09:00] Status: SUCCESS - Pembelian Kopi
+[09:15] Status: FAILED - Saldo Tidak Cukup
+[09:30] Status: SUCCESS - Pembelian Roti
+[10:00] Status: SUCCESS - Pembelian Susu
+[10:15] Status: FAILED - Koneksi Timeout
+```
+Setelah file berhasil dibuat, saya akan mencoba menggunakan grep -c pada file tersebut untuk mengetahui berapa banyak transaksi yang tercatat memiliki status SUCCES :
+```bash
+grep -c "SUCCESS" transaksi.txt
+3
+```
+Dapat terlihat bahwa grep tidak lagi menampilkan detail isi barisnya secara panjang lebar, melainkan langsung memberikan informasi angka yang presisi mengenai total temuan yang cocok. Dengan cara ini, saya bisa langsung mengetahui bahwa ada 3 transaksi sukses tanpa harus menghitungnya secara manual satu per satu di layar terminal.
 
